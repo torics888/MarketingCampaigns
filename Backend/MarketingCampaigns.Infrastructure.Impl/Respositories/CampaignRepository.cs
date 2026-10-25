@@ -60,7 +60,7 @@ public class CampaignRepository(CampaignDbContext context) : ICampaignRepository
         if (campaign == null)
             return ConsumeAmountResult.NotFound;
 
-        if (campaign.Status != CampaignStatus.Activa.ToString())
+        if (campaign.Status != CampaignStatus.Activa.ToString().ToLowerInvariant())
             return ConsumeAmountResult.CampaignNotActive;
 
         var now = DateTime.UtcNow;

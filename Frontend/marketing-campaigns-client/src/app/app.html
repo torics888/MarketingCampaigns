@@ -186,26 +186,29 @@
       Consumir pressupost (€)
     </label>
 
-    <div class="action-control">
-      <input
-        [id]="'amount-' + campaign.id"
-        type="number"
-        min="0.01"
-        step="0.01"
-        [name]="'amount-' + campaign.id"
-        [(ngModel)]="consumeAmounts[campaign.id]"
-        placeholder="Import" />
+<div class="action-control">
+  <input
+    [id]="'amount-' + campaign.id"
+    type="number"
+    min="0.01"
+    step="0.01"
+    [name]="'amount-' + campaign.id"
+    [(ngModel)]="consumeAmounts[campaign.id]"
+    placeholder="Import"
+    [disabled]="!canConsume(campaign) ||
+      processingCampaignId === campaign.id" />
 
-      <button
-        type="button"
-        class="secondary-button"
-        [disabled]="processingCampaignId === campaign.id ||
-          !consumeAmounts[campaign.id] ||
-          consumeAmounts[campaign.id]! <= 0"
-        (click)="consumeBudget(campaign.id)">
-        Aplica
-      </button>
-    </div>
+  <button
+    type="button"
+    class="secondary-button"
+    [disabled]="processingCampaignId === campaign.id ||
+      !consumeAmounts[campaign.id] ||
+      consumeAmounts[campaign.id]! <= 0 ||
+      !canConsume(campaign)"
+    (click)="consumeBudget(campaign.id)">
+    Aplica
+  </button>
+</div>
   </div>
 }
                   </td>

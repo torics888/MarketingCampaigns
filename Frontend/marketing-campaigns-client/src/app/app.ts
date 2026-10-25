@@ -205,4 +205,33 @@ consumeBudget(id: string): void {
       status: 'Esborrany'
     };
   }
+
+  canConsume(campaign: Campaign): boolean {
+  const now = new Date();
+
+  // Comparar por día natural, sin tener en cuenta la hora
+  const today = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate()
+  );
+
+  const start = new Date(campaign.startDate);
+  const startDay = new Date(
+    start.getFullYear(),
+    start.getMonth(),
+    start.getDate()
+  );
+
+  const end = new Date(campaign.endDate);
+  const endDay = new Date(
+    end.getFullYear(),
+    end.getMonth(),
+    end.getDate()
+  );
+
+  return campaign.status.toLowerCase() === 'activa'
+    && today >= startDay
+    && today <= endDay;
+}
 }
