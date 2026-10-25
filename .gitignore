@@ -361,3 +361,8 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Base de datos SQLite local
+MarketingCampaigns/Data/*.db
+MarketingCampaigns/Data/*.db-shm
+MarketingCampaigns/Data/*.db-wal

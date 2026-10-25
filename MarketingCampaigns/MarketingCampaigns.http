@@ -1,6 +1,0 @@
-@MarketingCampaigns_HostAddress = http://localhost:5010
-
-GET {{MarketingCampaigns_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
