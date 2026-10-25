@@ -100,6 +100,11 @@ Dins el projecte he posat separat en carpetas la part de backend i la part de fr
 Dins de backend obrir la solució, restaurar dependencies nuget per si cal amb ``dotnet restore`` i iniciar el projecte en local. 
 En la carpeta frontend obrir el projecte, instal·lar dependencies ``npm install`` i arrencar l'aplicacio amb ``npm start``. Aquest projecte consumeix l'api en local amb la ruta corresponent.
 
+BD
+el projecte utilitza sqlLite, la bd es desa localment a la carpeta `Data` del projecte api.
+per consultar i fer execucions en la taula he utilitzat  DB Browser for SQLite i obro la bd que hi ha a la carpeta data.
+
+
 ### 🧪 Com executar els tests
 En el projecte api desde el explorador de tests es pot executar indivisualment o grupalment els tests realitzats amb xunit.
 
