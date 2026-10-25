@@ -1,0 +1,319 @@
+
+<main class="container">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon" aria-hidden="true">C</div>
+      <div>
+        <h1>Campaign Manager</h1>
+        <p>Gestió de campanyes de màrqueting</p>
+      </div>
+    </div>
+    <span class="topbar-label">Panell d'administració</span>
+  </header>
+
+  <div>
+    <section class="page-heading">
+      <div>
+        <h2>Campanyes</h2>
+        <p>Consulta i gestiona les teves campanyes de màrqueting.</p>
+      </div>
+      <button class="primary-button" type="button" (click)="openCreateForm()">
+        <span aria-hidden="true">＋</span>
+        Nova campanya
+      </button>
+    </section>
+
+    @if (successMessage) {
+      <div class="notice success-notice" role="status">
+        {{ successMessage }}
+        <button type="button" class="notice-close"
+          aria-label="Tanca el missatge" (click)="successMessage = ''">×</button>
+      </div>
+    }
+
+    @if (actionMessage) {
+      <div class="notice success-notice" role="status">
+        {{ actionMessage }}
+        <button type="button" class="notice-close"
+          aria-label="Tanca el missatge" (click)="actionMessage = ''">×</button>
+      </div>
+    }
+
+    @if (actionError) {
+      <div class="notice error-notice" role="alert">
+        {{ actionError }}
+        <button type="button" class="notice-close"
+          aria-label="Tanca el missatge" (click)="actionError = ''">×</button>
+      </div>
+    }
+
+    <section class="stats-grid" aria-label="Resum de campanyes">
+      <article class="stat-card">
+        <span class="stat-label">Total de campanyes</span>
+        <strong>{{ campaigns.length }}</strong>
+        <span class="stat-description">Campanyes trobades</span>
+      </article>
+      <article class="stat-card">
+        <span class="stat-label">Campanyes actives</span>
+        <strong>{{ getCountByStatus('Activa') }}</strong>
+        <span class="stat-description">En curs</span>
+      </article>
+      <article class="stat-card">
+        <span class="stat-label">Pressupost total</span>
+        <strong>{{ getTotalBudget() | number:'1.2-2' }} €</strong>
+        <span class="stat-description">Pressupost assignat</span>
+      </article>
+    </section>
+
+    <section class="campaign-panel">
+      <div class="panel-header">
+        <div>
+          <h2>Llistat de campanyes</h2>
+          <p>Consulta les campanyes registrades i el seu estat.</p>
+        </div>
+
+        <div class="filter-control">
+          <label for="status">Filtra per estat</label>
+          <select id="status" [value]="selectedStatus"
+            (change)="onStatusChange($any($event.target).value)">
+            <option value="">Totes</option>
+            <option value="Activa">Activa</option>
+            <option value="Pausada">Pausada</option>
+            <option value="Finalitzada">Finalitzada</option>
+            <option value="Esborrany">Esborrany</option>
+          </select>
+        </div>
+      </div>
+
+      @if (loading) {
+        <div class="feedback" role="status">
+          <span class="spinner" aria-hidden="true"></span>
+          <p>Carregant campanyes...</p>
+        </div>
+      } @else if (errorMessage) {
+        <div class="feedback error-state" role="alert">
+          <h3>No s'han pogut carregar les campanyes</h3>
+          <p>{{ errorMessage }}</p>
+          <button type="button" class="secondary-button" (click)="loadCampaigns()">
+            Torna-ho a provar
+          </button>
+        </div>
+      } @else if (campaigns.length === 0) {
+        <div class="feedback empty-state">
+          <div class="empty-icon" aria-hidden="true">▤</div>
+          <h3>No hi ha campanyes</h3>
+          <p>No s'han trobat campanyes per a aquest estat.</p>
+          @if (selectedStatus) {
+            <button type="button" class="secondary-button" (click)="clearFilter()">
+              Mostra totes les campanyes
+            </button>
+          }
+        </div>
+      } @else {
+        <div class="table-wrapper">
+          <table>
+            <caption class="visually-hidden">Llistat de campanyes de màrqueting</caption>
+            <thead>
+              <tr>
+                <th scope="col">Campanya</th>
+                <th scope="col">Pressupost</th>
+                <th scope="col">Consumit</th>
+                <th scope="col">Disponible</th>
+                <th scope="col">Data d'inici</th>
+                <th scope="col">Data de finalització</th>
+                <th scope="col">Estat</th>
+                <th scope="col">Accions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (campaign of campaigns; track campaign.id) {
+                <tr>
+                  <td>
+                    <div class="campaign-name">
+                      <span class="campaign-avatar" aria-hidden="true">
+                        {{ campaign.name.charAt(0).toUpperCase() }}
+                      </span>
+                      <span>{{ campaign.name }}</span>
+                    </div>
+                  </td>
+                  <td class="amount">{{ campaign.totalAmount | number:'1.2-2' }} €</td>
+                  <td class="amount">{{ campaign.consumedAmount | number:'1.2-2' }} €</td>
+                  <td class="amount available">
+                    {{ campaign.totalAmount - campaign.consumedAmount | number:'1.2-2' }} €
+                  </td>
+                  <td>{{ campaign.startDate | date:'dd/MM/yyyy' }}</td>
+                  <td>{{ campaign.endDate | date:'dd/MM/yyyy' }}</td>
+                  <td>
+                    <span class="status-badge"
+                      [class.active]="campaign.status.toLowerCase() === 'activa'"
+                      [class.paused]="campaign.status.toLowerCase() === 'pausada'"
+                      [class.finished]="campaign.status.toLowerCase() === 'finalitzada'"
+                      [class.draft]="campaign.status.toLowerCase() === 'esborrany'">
+                      <span class="status-dot" aria-hidden="true"></span>
+                      {{ campaign.status }}
+                    </span>
+                  </td>
+                  <td class="actions-cell">
+                  <div class="row-action">
+  <label>Estat de la campanya</label>
+
+  @if (campaign.status.toLowerCase() === 'activa') {
+    <button
+      type="button"
+      class="secondary-button"
+      [disabled]="processingCampaignId === campaign.id"
+      (click)="statusChanges[campaign.id] = 'Pausada'; updateStatus(campaign.id)">
+      {{ processingCampaignId === campaign.id ? 'Desant...' : 'Pausar campanya' }}
+    </button>
+  } @else if (campaign.status.toLowerCase() === 'pausada') {
+    <button
+      type="button"
+      class="secondary-button"
+      [disabled]="processingCampaignId === campaign.id"
+      (click)="statusChanges[campaign.id] = 'Activa'; updateStatus(campaign.id)">
+      {{ processingCampaignId === campaign.id ? 'Desant...' : 'Activar campanya' }}
+    </button>
+  } @else {
+    <span class="action-hint">
+      No es pot modificar aquest estat
+    </span>
+  }
+</div>
+
+@if (campaign.status.toLowerCase() === 'activa') {
+  <div class="row-action">
+    <label [for]="'amount-' + campaign.id">
+      Consumir pressupost (€)
+    </label>
+
+    <div class="action-control">
+      <input
+        [id]="'amount-' + campaign.id"
+        type="number"
+        min="0.01"
+        step="0.01"
+        [name]="'amount-' + campaign.id"
+        [(ngModel)]="consumeAmounts[campaign.id]"
+        placeholder="Import" />
+
+      <button
+        type="button"
+        class="secondary-button"
+        [disabled]="processingCampaignId === campaign.id ||
+          !consumeAmounts[campaign.id] ||
+          consumeAmounts[campaign.id]! <= 0"
+        (click)="consumeBudget(campaign.id)">
+        Aplica
+      </button>
+    </div>
+  </div>
+}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <footer class="table-footer">
+          <span>
+            {{ campaigns.length }}
+            {{ campaigns.length === 1 ? 'campanya' : 'campanyes' }}
+          </span>
+          @if (selectedStatus) {
+            <button class="text-button" type="button" (click)="clearFilter()">
+              Neteja el filtre
+            </button>
+          }
+        </footer>
+      }
+    </section>
+  </div>
+
+  <footer class="page-footer">
+    <span>Campaign Manager</span>
+    <span>Gestió de campanyes de màrqueting</span>
+  </footer>
+</main>
+
+@if (showCreateForm) {
+  <div class="modal-backdrop" (click)="closeCreateForm()">
+    <section class="modal" role="dialog" aria-modal="true"
+      aria-labelledby="create-title" (click)="$event.stopPropagation()">
+      <header class="modal-header">
+        <div>
+          <h2 id="create-title">Nova campanya</h2>
+          <p>Introdueix les dades de la nova campanya.</p>
+        </div>
+        <button class="icon-button" type="button"
+          aria-label="Tanca el formulari" (click)="closeCreateForm()">×</button>
+      </header>
+
+      <form #campaignForm="ngForm" (ngSubmit)="createCampaign()" novalidate>
+        <div class="form-field">
+          <label for="campaign-name">Nom de la campanya <span>*</span></label>
+          <input id="campaign-name" name="name" type="text"
+            [(ngModel)]="newCampaign.name" required maxlength="100"
+            placeholder="Ex. Campanya de tardor" #nameInput="ngModel" />
+          @if (nameInput.invalid && nameInput.touched) {
+            <small class="field-error">Introdueix el nom de la campanya.</small>
+          }
+        </div>
+
+        <div class="form-field">
+          <label for="campaign-budget">Pressupost total (€) <span>*</span></label>
+          <input id="campaign-budget" name="totalAmount" type="number"
+            [(ngModel)]="newCampaign.totalAmount" required min="0.01"
+            step="0.01" placeholder="1000,00" #budgetInput="ngModel" />
+          @if (budgetInput.invalid && budgetInput.touched) {
+            <small class="field-error">El pressupost ha de ser superior a zero.</small>
+          }
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="campaign-start">Data d'inici <span>*</span></label>
+            <input id="campaign-start" name="startDate" type="date"
+              [(ngModel)]="newCampaign.startDate" required
+              #startInput="ngModel" />
+            @if (startInput.invalid && startInput.touched) {
+              <small class="field-error">Indica la data d'inici.</small>
+            }
+          </div>
+          <div class="form-field">
+            <label for="campaign-end">Data de finalització <span>*</span></label>
+            <input id="campaign-end" name="endDate" type="date"
+              [(ngModel)]="newCampaign.endDate" required
+              [min]="minEndDate || null"
+              #endInput="ngModel" />
+            @if (endInput.invalid && endInput.touched) {
+              <small class="field-error">
+                La data de finalització ha de ser posterior a la data d'inici.
+              </small>
+            }
+          </div>
+        </div>
+
+        @if (createError) {
+          <div class="notice error-notice" role="alert">{{ createError }}</div>
+        }
+
+        <div class="modal-actions">
+          <button type="button" class="secondary-button"
+            (click)="closeCreateForm()" [disabled]="saving">
+            Cancel·la
+          </button>
+          <button type="submit" class="primary-button"
+            [disabled]="saving || campaignForm.invalid ||
+              !newCampaign.name.trim() ||
+              newCampaign.totalAmount <= 0 ||
+              !newCampaign.startDate ||
+              !newCampaign.endDate ||
+              newCampaign.endDate <= newCampaign.startDate">
+            {{ saving ? 'Desant...' : 'Crea la campanya' }}
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+}

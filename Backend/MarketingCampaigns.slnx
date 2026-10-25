@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="MarketingCampaigns.Infrastructure.Contracts/02-MarketingCampaigns.Infrastructure.Contracts.csproj" />
+  <Project Path="MarketingCampaigns.Infrastructure.Impl/02-MarketingCampaigns.Infrastructure.Impl.csproj" />
+  <Project Path="MarketingCampaigns.Library.Contracts/01-MarketingCampaigns.Library.Contracts.csproj" />
+  <Project Path="MarketingCampaigns.Library.Impl/01-MarketingCampaigns.Library.Impl.csproj" />
+  <Project Path="MarketingCampaigns.Tests/MarketingCampaigns.Tests.csproj" />
+  <Project Path="MarketingCampaigns/00-MarketingCampaigns.csproj" />
+</Solution>
